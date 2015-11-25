@@ -1,7 +1,7 @@
 ///======================================================================
 /// PROJECT CODE[] = 00 - 34 - 13 - 08 - 00 - 00 - 00 - 00
 ///======================================================================
-static unsigned char zeitec_zet6221_firmware[]  __initdata = 
+static unsigned char zeitec_zet6221_firmware[] = 
 {
 0x01,0x90,0x53,0xC0,0xF1,0x78,0x7F,0xE4,
 0xF6,0xD8,0xFD,0xF6,0xE5,0xC0,0x24,0x02,

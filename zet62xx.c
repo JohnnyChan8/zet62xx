@@ -87,7 +87,7 @@
 #elif defined(CONFIG_RK3128_BOARD_TEST)
     #include "zet6251_fw.h"
     #include "zet6223_fw.h"
-    #include "zet6221_fw_80.h"
+    #include "zet6221_fw_50.h"
     #include "zet6231_fw.h"
 #elif defined(CONFIG_RK3026_BOARD_TH785)
     #include "zet6251_fw_rk3026_th785.h"
