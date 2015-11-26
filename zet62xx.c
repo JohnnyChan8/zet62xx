@@ -2785,11 +2785,43 @@ void zet622x_ts_coordinate_translating(struct finger_coordinate_struct* finger_r
 ///**********************************************************************
 int last_gesture;
 int last_valid = 0;
+int mouse_finger = 0;
+int wheel_y_bak = 0;
 static void zet622x_ts_mouse_report(struct zet622x_tsdrv *ts)
 {
-	int x, y;
+	int x, y, wheel;
 	int count=0;
 
+	if (mouse_finger = 2)
+	{
+		y = finger_report[0].report_y + finger_report[1].report_y;
+		
+		x = (y - wheel_y_bak)/20;
+		
+		if (x>0)
+		{
+			wheel = 1;
+		}
+		else if (x<0)
+		{
+			wheel = -1;
+			x = abs(x);
+		}
+		else
+		{
+			wheel = 0;
+		}
+		
+		if (wheel != 0)
+		{
+			for (count = 0; count < x; count)
+				input_report_rel(ts->input, REL_WHEEL, wheel);
+		}
+		
+		wheel_y_bak = y;
+		
+		return 0;
+	}
 	//chenzy
 	if (finger_report[0].valid)
 	{
@@ -2833,14 +2865,14 @@ static void zet622x_ts_mouse_report(struct zet622x_tsdrv *ts)
 	}
 	
 	last_valid = finger_report[0].valid;
-	input_report_key(ts->input, BTN_LEFT, gesture);
+	//input_report_key(ts->input, BTN_LEFT, gesture);
 	//if (last_gesture != gesture)
-	//if (gesture==1)
-	//{
-	//	input_report_key(ts->input, BTN_LEFT, 1);
-	//	mdelay(20);
-	//	input_report_key(ts->input, BTN_LEFT, 0);
-	//}
+	if (gesture==1)
+	{
+		input_report_key(ts->input, BTN_LEFT, 1);
+		mdelay(200);
+		input_report_key(ts->input, BTN_LEFT, 0);
+	}
 		
 	last_gesture = gesture;
 	input_report_rel(ts->input, REL_X, -x_rel);
@@ -2897,13 +2929,22 @@ static u8 zet622x_ts_parse_dynamic_finger(struct i2c_client *client)
 		//printk("chenzy : x_temp=%d, y_temp=%d\n", x_temp, y_temp);
 		//finger_report[0].report_x = finger_report[i].report_x;
 		//finger_report[0].report_y = finger_report[i].report_y;
-		if (valid == 0x80)
+		if (valid == 0x80)//one finger
 		{
 			finger_report[0].valid = 1;
+			mouse_finger = 1;
+		}
+		else if (valid == 0xC0)//two finger
+		{
+			finger_report[0].valid = 1;
+			finger_report[1].valid = 1;
+			mouse_finger = 2;
 		}
 		else
 		{
 			finger_report[0].valid = 0;
+			finger_report[1].valid = 0;
+			mouse_finger = 1;
 		}
 		//if (finger_report[i].valid == 1)
 		//	printk("chenzy : p=%d, x=%x, y=%x, z=%x\n", finger_report[i].valid, finger_report[i].report_x, finger_report[i].report_y, finger_report[i].report_z);
@@ -6084,7 +6125,8 @@ static int  zet622x_ts_probe(struct i2c_client *client, const struct i2c_device_
 	set_bit(EV_REL, input_dev->evbit);
 	set_bit(REL_X, input_dev->relbit);
 	set_bit(REL_Y, input_dev->relbit);
-
+	set_bit(REL_WHEEL, input_dev->relbit);
+	
 	set_bit(EV_KEY, input_dev->evbit);
 	set_bit(BTN_LEFT, input_dev->keybit);
 			
